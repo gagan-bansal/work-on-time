@@ -2,25 +2,35 @@
   "name": "work-on-time",
   "version": "0.0.1",
   "description": "Simple job scheduler for Node.js with persistence store.",
-  "main": "lit/index.js",
+  "main": "lit/work-on-time.js",
   "directories": {
     "lib": "lib",
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "tap test/*test.js"
   },
   "author": "Gagan Bansal",
   "license": "MIT",
   "dependencies": {
+    "abort-controller": "^3.0.0",
     "bluebird": "^3.7.2",
     "cron": "^1.8.2",
     "extend": "^3.0.2",
+    "mockdate": "^3.0.5",
     "mongodb": "^4.2.2",
     "p-queue": "^6.6.2",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "delay": "^5.0.0"
+    "clone": "^2.1.2",
+    "delay": "^5.0.0",
+    "mongodb-memory-server": "^8.3.0",
+    "sinon": "^13.0.1",
+    "tap": "^15.1.6"
+  },
+  "tap": {
+    "check-coverage": true,
+    "lines": 80
   }
 }

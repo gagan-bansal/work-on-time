@@ -1,23 +1,32 @@
 const t = require('tap');
 const uuid = require('uuid');
+const { MongoMemoryServer } = require('mongodb-memory-server');
 const { isClass } = require('./helper.js');
 const {Task} = require('../lib/task.js');
-
+const {MongoStore} = require('../lib/mongo-store.js');
+t.before(async () => {
+  t.context.job = {
+    name: 'mailer',
+    worker: function () {
+      return new Promise(() => {});
+    }
+  }
+  const mongod = await MongoMemoryServer.create();
+  const uri = mongod.getUri();
+  t.context.mongod = mongod;
+  t.context.store = new MongoStore({
+    uri: uri
+  })
+  await t.context.store.init();
+})
 t.ok(isClass(Task), 'exported Class')
 t.type(Task.createTask, 'function', 'has static method createTask');
-
-const job = {
-  name: 'mailer',
-  worker: function () {
-    return new Promise(() => {});
-  }
-}
 
 t.test('Create new instance', async (t) => {
   const task = new Task({
     data: {foo: 'bar', baz: {quax: 1}},
     when: 123
-  }, job);
+  }, t.context.job, t.context.store);
   t.ok(task instanceof Task, 'Instance created');
   t.ok(uuid.validate(task.uuid), 'instance has uuid');
   t.type(task.save, 'function', 'has method save');
@@ -36,6 +45,7 @@ t.test('Create new instance', async (t) => {
       isSourceCron: false,
       storeResult: false,
       persistTaskStatus: true,
+      persistCronStatus: true,
       parentTask: false,
       isActive: true,
       status: {  }
@@ -46,9 +56,9 @@ t.test('Recreate instance', async (t) => {
   const task = new Task({
     data: {foo: 'bar', baz: {quax: 1}},
     when: 123
-  }, job);
+  }, t.context.job, t.context.store);
   const plain = task.toPlainObject()
-  const task2 = Task.createTask(plain, job)
+  const task2 = Task.createTask(plain, t.context.job, t.context.store);
 
   t.ok(task instanceof Task, 'Instance recreated');
   t.ok(task.uuid, 'has uuid');
@@ -62,8 +72,13 @@ t.test('Test task methods', async (t) => {
   const task = new Task({
     data: {foo: 'bar', baz: {quax: 1}},
     when: 123
-  }, job);
+  }, t.context.job, t.context.store);
   t.ok(task.shouldProcess(), 'should process return true');
   task.status.started = Date.now()
   t.notOk(task.shouldProcess(), 'should process return false');
+})
+
+t.teardown(async () => {
+  await t.context.store.close();
+  await t.context.mongod.stop();
 })

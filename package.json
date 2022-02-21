@@ -2,7 +2,7 @@
   "name": "work-on-time",
   "version": "0.0.1",
   "description": "Simple job scheduler for Node.js with persistence store.",
-  "main": "lit/work-on-time.js",
+  "main": "lib/work-on-time.js",
   "directories": {
     "lib": "lib",
     "test": "test"

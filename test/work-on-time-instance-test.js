@@ -4,7 +4,6 @@ const sinon = require('sinon');
 const { isClass } = require('./helper.js');
 const {WorkOnTime} = require('../lib/work-on-time.js');
 const {MongoStore} = require('../lib/mongo-store.js');
-const sinon = require('sinon');
 
 t.beforeEach(async t => {
   const mongod = await MongoMemoryServer.create();
@@ -29,22 +28,21 @@ t.test('Class/instance', async t => {
   t.ok(wot instanceof WorkOnTime, 'Instance created');
   t.same(wot.jobs, {}, 'has property jobs');
   t.ok(wot.store instanceof MongoStore, 'has mongo store');
-  
+
   t.todo('onStart');
   t.todo('onFail');
   t.equal(wot.setIntervalId, undefined, 'has property setIntervalId');
   t.ok(wot.runInterval, 'has property run interval');
-  
+
   t.same(wot._jobsInQueue, {}, 'has property _jobsInQueue');
   t.same(wot.crons, {}, 'has prorty crons');
   t.ok(typeof wot.nowThreshold === 'number', 'has nowThreshold');
   t.equal(wot._started, false, 'has property _started');
   t.equal(wot._initiated, false, 'has property _initiated');
   t.todo('wot.close');
-  
+
   await t.resolves(wot.init(), 'Instance initiated');
   t.ok(wot.store.init.called, 'init method calls store.init');
-  t.ok(wot._start.called, 'init method calls _start');
   await wot.store.close();
 });
 

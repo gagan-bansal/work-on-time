@@ -12,6 +12,10 @@
   },
   "author": "Gagan Bansal",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gagan-bansal/work-on-time"
+  },
   "dependencies": {
     "abort-controller": "^3.0.0",
     "bluebird": "^3.7.2",

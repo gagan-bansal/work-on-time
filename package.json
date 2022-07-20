@@ -1,6 +1,6 @@
 {
   "name": "work-on-time",
-  "version": "0.0.2-alpha.7",
+  "version": "0.0.2-alpha.8",
   "description": "Simple job scheduler for Node.js with persistence store.",
   "main": "lib/work-on-time.js",
   "directories": {

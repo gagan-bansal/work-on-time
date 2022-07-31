@@ -2,14 +2,23 @@
   "name": "work-on-time",
   "version": "0.0.2-alpha.8",
   "description": "Simple job scheduler for Node.js with persistence store.",
-  "main": "lib/work-on-time.js",
+  "main": "index.js",
   "directories": {
     "lib": "lib",
     "test": "test"
   },
   "scripts": {
-    "test": "tap test/*test.js"
+    "test": "tap test/*test.js",
+    "watch:dash": "parcel watch --dist-dir dist-dev --public-url ./ --no-autoinstall --log-level verbose dashboard/**/*.html",
+    "build:dash": "parcel build --dist-dir dist --public-url ./ --no-autoinstall --log-level verbose dashboard/**/*.html",
+    "watch:dev-server": "nodemon -i dashboard -i dist dev-server.js"
   },
+  "targets": {
+    "main": false
+  },
+  "includePaths": [
+    "node_modules"
+  ],
   "author": "Gagan Bansal",
   "license": "MIT",
   "repository": {
@@ -27,10 +36,20 @@
   },
   "devDependencies": {
     "clone": "^2.1.2",
+    "connect-livereload": "^0.6.1",
+    "datatables.net": "^1.12.1",
+    "datatables.net-dt": "^1.12.1",
+    "dayjs": "^1.11.4",
     "delay": "^5.0.0",
+    "express": "^4.18.1",
+    "jquery": "^3.6.0",
+    "livereload": "^0.9.3",
     "mockdate": "^3.0.5",
     "mongodb-memory-server": "^8.3.0",
+    "parcel": "^2.6.2",
+    "process": "^0.11.10",
     "sinon": "^13.0.1",
+    "supertest": "^6.2.4",
     "tap": "^15.1.6"
   },
   "tap": {

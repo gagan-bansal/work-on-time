@@ -12,7 +12,7 @@ function getRouter (wot, options) {
   )(wot);
 
   router.get('/api/tasks', controller.list);
-  //router.get('/tasks', views.tasks);
+  router.put('/api/task/stop/:uuid', controller.stop);
   router.get('/:file', views.staticFiles);
   return router;
 }

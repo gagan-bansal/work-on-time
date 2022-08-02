@@ -28,6 +28,19 @@ module.exports = function (wot, options) {
       .catch(err => {
         res.status(500).json({message: 'Internal Server Error'})
       })
+    },
+
+    stop: async function (req, res) {
+      const uuid = req.params.uuid;
+      const resp = await wot.stopTask(uuid)
+        .catch(err => {
+          if (/^Task not running/i.test(err.message)) {
+            res.status(400).json({message: 'Task not running: ' + uuid});
+          } else {
+            res.status(500).json({message: err.message});
+          }
+        });
+      res.status(200).json(resp);
     }
   }
 };

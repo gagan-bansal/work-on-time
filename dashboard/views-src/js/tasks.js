@@ -1,10 +1,15 @@
 import $ from 'jquery';
 import dt from 'datatables.net-dt';
 import * as dayjs from 'dayjs';
+import advancedFormat from 'dayjs/plugin/advancedFormat';
+dayjs.extend(advancedFormat);
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone'); // dependent on utc plugin
+dayjs.extend(utc)
+dayjs.extend(timezone)
 dt();
 import 'datatables.net-dt/css/jquery.dataTables.css';
 
-//$('#list').DataTable();
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const refreshInterval = urlParams.get('refreshInterval') || 30000
@@ -16,13 +21,24 @@ if (urlParams.get('refresh')) {
 
 let tasksTable;
 
+loadTable();
+
 function loadTable () {
-  tasksTable = $('#list').DataTable({
+  tasksTable = $('#tblTasks').DataTable({
     // data: data,
     ajax: './api/tasks',
     columns: [
       {title: 'uuid', uuid: 'uuid', data: 'uuid',
         render: colorJobId
+      },
+      {title: 'Job', data: 'job', defaultContent: ''},
+      {title: 'Job Id', data: 'data.id', defaultContent: ''},
+      {
+        title: "Task Data",
+        "className": 'details-control',
+        "orderable": false,
+        "data": null,
+        "defaultContent": '<input type="button" class="btn btn-task-data" value="Task Data">'
       },
       {title: 'Created', defaultContent: '',
         data: function (rec) {
@@ -30,32 +46,30 @@ function loadTable () {
         },
         render: formatDate
       },
-      // {title: 'Updated', visible: false, defaultContent: '',
-      //   data: function (rec) {
-      //     let updates = [rec.created]
-      //     updates = updates.concat(Object.values(rec.status))
-      //     updates.sort().reverse()
-      //     return updates[0]
-      //   },
-      //   render: formatDate
-      // },
-      {title: 'Job', data: 'job', defaultContent: ''},
       {title: 'Added To Queue', data: 'status.addedToQueue', defaultContent: '', render: formatDate, visible: false},
       {title: 'Started', data: 'status.started', defaultContent: '', render: formatDate},
       {title: 'Stopped', data: 'status.stopped', defaultContent: '-', render: formatDate},
       {title: 'Failed', data: 'status.failed', defaultContent: '-', render: formatDate},
-      {title: 'Completed', data: 'status.completed', defaultContent: '-', render: formatDate},
       {title: 'Message',
         data: function (rec) {
           return rec.message || (rec.error && rec.error.message) || rec.error || '-'
         },
         defaultContent: '-'
       },
+      {title: 'Completed', data: 'status.completed', defaultContent: '-', render: formatDate},
       {
+        title: "Task Result",
+        "className": 'details-control',
+        "orderable": false,
+        "data": null,
+        "defaultContent": '<input type="button" class="btn btn-result" value="Result">'
+      },
+      {
+        title: 'Actions',
         "className":      'details-control',
         "orderable":      false,
         "data":           null,
-        "defaultContent": '<input type="button" class="btn" value="More"> <input class="btn" type="button" value="Stop">'
+        "defaultContent": '<input class="btn btn-stop" type="button" value="Stop">'
       }
     ],
     order: [[ 1, "desc" ]],
@@ -65,37 +79,59 @@ function loadTable () {
     }]
   })
 
-  $('#tblTasks tbody').on('click', 'td.details-control .btn', function () {
+  $('#tblTasks tbody').on('click', '.btn-task-data', function () {
     var tr = $(this).closest('tr');
     var row = tasksTable.row( tr );
     var btn = this;
-    var action = $(this).val().toLowerCase();
-    if (action === 'stop') {
-      console.log('will stop the task');
-      stopTask(row.data());
-    } else if (/(more|less)/.test(action)) {
-      // var btn = $(this).find('input') 
+      // var btn = $(this).find('input')
       if ( row.child.isShown() ) {
         // This row is already open - close it
         row.child.hide();
         tr.removeClass('shown');
-        $(btn).val('More')
+        $(btn).val('Task Data')
       }
       else {
         // Open this row
         //row.child( format(row.data()) ).show();
-        row.child('<pre> ' + JSON.stringify(row.data(), null, 4) + '</pre>').show();
+        const data = row.data();
+        row.child('<pre> ' + JSON.stringify(data.data || 'No data', null, 4) + '</pre>').show();
         tr.addClass('shown');
         $(btn).val('Less')
       }
-    }
-  } );
+  });
+
+  $('#tblTasks tbody').on('click', '.btn-result', function () {
+    var tr = $(this).closest('tr');
+    var row = tasksTable.row( tr );
+    var btn = this;
+      // var btn = $(this).find('input')
+      if ( row.child.isShown() ) {
+        // This row is already open - close it
+        row.child.hide();
+        tr.removeClass('shown');
+        $(btn).val('Result')
+      }
+      else {
+        // Open this row
+        //row.child( format(row.data()) ).show();
+        const data = row.data();
+        row.child('<pre> ' + JSON.stringify(data || 'No result', null, 4) + '</pre>').show();
+        tr.addClass('shown');
+        $(btn).val('Less')
+      }
+  });
+
+  $('#tblTasks tbody').on('click', '.btn-stop', function () {
+    var tr = $(this).closest('tr');
+    var row = tasksTable.row( tr );
+    stopTask(row.data());
+  });
 }
 
 // render function to format date
 function formatDate (data, type, row) {
   if (data === '-') return data
-  return data ? dayjs(data).format() : ''
+  return data ? dayjs.tz(data, 'Asia/Kolkata').format('YYYY-MM-DD kk:mm:ss') : ''
 }
 
 function colorJobId (data, type, row) {
@@ -115,4 +151,22 @@ function formatStatus (td, data, rowData, row, col) {
   if (data === 'running') $(td).css('color', 'orange')
 }
 
-loadTable();
+// stop the running task
+function stopTask(rowData) {
+  $.ajax({
+    method: 'PUT',
+    url: `./api/task/stop/${rowData.uuid}`,
+    cache: false
+  })
+  .done(function(data) {
+    // superSet.rawData = data
+    //var filtered = showAll === 'true' ? data : data.filter(doc => doc.job !== 'upf')
+    // loadTable(data)
+    tasksTable.ajax.reload(null, false);
+    console.log(data)
+    //fetchJobs();
+  })
+  .fail(function (resp) {
+    console.error('Error: ', resp.message);
+  })
+}

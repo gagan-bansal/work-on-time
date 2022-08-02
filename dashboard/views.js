@@ -1,7 +1,8 @@
 const path = require('path');
-
+const distDir = process.env.NODE_ENV === 'development' ?
+  '../dist-dev' : '../dist';
 const config = {
-  root: path.resolve(__dirname, '../dist'),
+  root: path.resolve(__dirname, distDir),
   dotfiles: 'deny',
   headers: {
     'x-timestamp': Date.now(),

@@ -19,14 +19,14 @@ if (urlParams.get('refresh')) {
   }, parseInt(refreshInterval) * 1000);
 }
 
-let tasksTable;
+let cronTasksTable;
 
 loadTable();
 
 function loadTable () {
-  tasksTable = $('#tblTasks').DataTable({
+  cronTasksTable = $('#tblCronTasks').DataTable({
     // data: data,
-    ajax: './api/tasks',
+    ajax: './api/cron-tasks',
     columns: [
       {title: 'uuid', uuid: 'uuid', data: 'uuid',
         render: colorJobId
@@ -46,51 +46,40 @@ function loadTable () {
         },
         render: formatDate
       },
-      {title: 'Added To Queue', data: 'status.addedToQueue', defaultContent: '', render: formatDate, visible: false},
-      {title: 'Started', data: 'status.started', defaultContent: '', render: formatDate},
-      {title: 'Stopped', data: 'status.stopped', defaultContent: '-', render: formatDate},
-      {title: 'Failed', data: 'status.failed', defaultContent: '-', render: formatDate},
+      {title: 'Schedule', data: 'when', defaultContent: '', render: formatWhen},
+      {title: 'Stopped/Activated',
+        data: function (rec) {
+          return Math.max(rec.status.restarted || 0, rec.status.stopped || 0) || '-'
+        },
+        defaultContent: '-', render: formatDate},
       {title: 'Message',
         data: function (rec) {
           return rec.message || (rec.error && rec.error.message) || rec.error || '-'
         },
         defaultContent: '-'
       },
-      {title: 'Completed', data: 'status.completed', defaultContent: '-', render: formatDate},
-      {
-        title: "Task Result",
-        "className": 'details-control',
-        "orderable": false,
-        "data": null,
-        //"defaultContent": '<input type="button" class="btn btn-result" value="Result">'
-        render: function (data, type, row) {
-          const isDone = data.status.completed || data.status.failed || data.status.stopped;
-          return isDone ? '<input type="button" class="btn btn-result" value="Result">' : '-';
-        }
-      },
       {
         title: 'Actions',
         "className":      'details-control',
         "orderable":      false,
         "data":           null,
-        // "defaultContent": '<input class="btn btn-stop" type="button" value="Stop">'
         render: function (data, type, row) {
-          const isRunning = data.status.started &&
-            !data.status.completed  && !data.status.failed && !data.status.stopped;
-          return isRunning ? '<input class="btn btn-stop" type="button" value="Stop">' : '-';
+          return data.isActive ? '<input class="btn btn-stop" type="button" value="Stop">'
+            : '<input class="btn btn-activate" type="button" value="Activate">';
         }
       }
     ],
-    order: [[ 4, "desc" ]],
+    order: [[ 1, "desc" ]],
     columnDefs:[{
       targets: '_all',
       createdCell: formatStatus
     }]
   })
 
-  $('#tblTasks tbody').on('click', '.btn-task-data', function () {
+  $('#tblCronTasks tbody').on('click', '.btn-task-data', function () {
+    console.log('show task data');
     var tr = $(this).closest('tr');
-    var row = tasksTable.row( tr );
+    var row = cronTasksTable.row( tr );
     var btn = this;
       // var btn = $(this).find('input')
       if ( row.child.isShown() ) {
@@ -102,16 +91,16 @@ function loadTable () {
       else {
         // Open this row
         //row.child( format(row.data()) ).show();
-        const data = row.data();
-        row.child('<pre> ' + JSON.stringify(data.data || 'No data', null, 4) + '</pre>').show();
+        const task = row.data();
+        row.child('<pre> ' + JSON.stringify(task.data || 'No data', null, 4) + '</pre>').show();
         tr.addClass('shown');
         $(btn).val('Less')
       }
   });
 
-  $('#tblTasks tbody').on('click', '.btn-result', function () {
+  $('#tblCronTasks tbody').on('click', '.btn-result', function () {
     var tr = $(this).closest('tr');
-    var row = tasksTable.row( tr );
+    var row = cronTasksTable.row( tr );
     var btn = this;
       // var btn = $(this).find('input')
       if ( row.child.isShown() ) {
@@ -130,10 +119,16 @@ function loadTable () {
       }
   });
 
-  $('#tblTasks tbody').on('click', '.btn-stop', function () {
+  $('#tblCronTasks tbody').on('click', '.btn-stop', function () {
     var tr = $(this).closest('tr');
-    var row = tasksTable.row( tr );
+    var row = cronTasksTable.row( tr );
     stopTask(row.data());
+  });
+
+  $('#tblCronTasks tbody').on('click', '.btn-activate', function () {
+    var tr = $(this).closest('tr');
+    var row = cronTasksTable.row( tr );
+    restartTask(row.data());
   });
 }
 
@@ -143,12 +138,13 @@ function formatDate (data, type, row) {
   return data ? dayjs.tz(data, 'Asia/Kolkata').format('YYYY-MM-DD kk:mm:ss') : ''
 }
 
+function formatWhen (data, type, row) {
+  return data;
+}
 function colorJobId (data, type, row) {
   let color
-  if (row.status.completed) color = '#03a652'
-  else if (row.status.failed || row.status.stopped) color = 'red'
-  else if (row.status.started) color = '#444da3'
-  else if (row.status.addedToQueue) color = '#fdaf16'
+  if (row.status.stopped) color = 'orange'
+  else color = '#03a652'
   if (color) return `<span style="color:${color};font-weight:bold;">${data}</span>`
   else return data
 }
@@ -168,7 +164,22 @@ function stopTask(rowData) {
     cache: false
   })
   .done(function(data) {
-    tasksTable.ajax.reload(null, false);
+    cronTasksTable.ajax.reload(null, false);
+  })
+  .fail(function (resp) {
+    console.error('Error: ', resp.message);
+  })
+}
+
+// stop the running task
+function restartTask(rowData) {
+  $.ajax({
+    method: 'PUT',
+    url: `./api/task/restart/${rowData.uuid}`,
+    cache: false
+  })
+  .done(function(data) {
+    cronTasksTable.ajax.reload(null, false);
   })
   .fail(function (resp) {
     console.error('Error: ', resp.message);

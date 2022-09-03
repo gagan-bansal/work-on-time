@@ -11,7 +11,8 @@
     "test": "tap test/*test.js",
     "watch:dash": "parcel watch --dist-dir dist-dev --public-url ./ --no-autoinstall --log-level verbose dashboard/**/*.html",
     "build:dash": "parcel build --dist-dir dist --public-url ./ --no-autoinstall --log-level verbose dashboard/**/*.html",
-    "watch:dev-server": "nodemon -i dashboard/views-src -i dist-dev -i dist dev-server.js"
+    "watch:dev-server": "nodemon -i dashboard/views-src -i dist-dev -i dist dev-server.js",
+    "release:pre": "npm version prerelease --preid=alpha"
   },
   "targets": {
     "main": false

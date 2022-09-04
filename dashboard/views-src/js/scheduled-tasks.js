@@ -26,13 +26,13 @@ loadTable();
 function loadTable () {
   cronTasksTable = $('#tblCronTasks').DataTable({
     // data: data,
-    ajax: './api/cron-tasks',
+    ajax: './api/scheduled-tasks',
     columns: [
       {title: 'uuid', uuid: 'uuid', data: 'uuid',
-        render: colorJobId
+        render: colorTaskId
       },
-      {title: 'Job', data: 'job', defaultContent: ''},
-      {title: 'Job Id', data: 'data.id', defaultContent: ''},
+      {title: 'Worker', data: 'worker', defaultContent: ''},
+      {title: 'Task Id', data: 'data.id', defaultContent: ''},
       {
         title: "Task Data",
         "className": 'details-control',
@@ -141,7 +141,7 @@ function formatDate (data, type, row) {
 function formatWhen (data, type, row) {
   return data;
 }
-function colorJobId (data, type, row) {
+function colorTaskId (data, type, row) {
   let color
   if (row.status.stopped) color = 'orange'
   else color = '#03a652'

@@ -23,9 +23,9 @@ t.beforeEach(async t => {
   })
   await wot.init();
   await wot._start();
-  wot.defineJob({
+  wot.defineWorker({
     name: 'foo',
-    worker: () => Promise.resolve({count: 20})
+    handler: () => Promise.resolve({count: 20})
   });
   t.context.wot = wot;
 
@@ -52,11 +52,11 @@ t.afterEach(async t => {
 t.test('Controller methods', async t => {
   await request(t.context.app)
     .post('/tasks')
-    .send({job: 'foo'})
+    .send({worker: 'foo'})
     .set('Accept', 'application/json')
     .expect('Content-Type', /json/)
     .expect(200)
-  t.ok(1, 'create: Job created');
+  t.ok(1, 'create: task created');
 
   await request(t.context.app)
     .get('/tasks')

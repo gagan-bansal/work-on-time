@@ -24,7 +24,7 @@ module.exports = async function () {
     }
   });
   barWorker.on('complete', ()=> {
-    console.log('Hey bar job is over');
+    console.log('Hey bar worker is over');
   });
   wot.addWorker(barWorker);
 
@@ -55,11 +55,11 @@ module.exports = async function () {
   });
   wot.addWorker(cronWorker);
 
-  await wot.addTask({job: 'foo', data: {id: '123'}});
-  await wot.addTask({job: 'fooError'});
-  await wot.addTask({job: 'bar'});
-  await wot.addTask({job: 'fooCron', when: '*/10 * * * * *'});
-  await wot.addTask({job: 'fooCron', when: '*/1 * * * * *', data: 'id 20 '});
+  await wot.addTask({worker: 'foo', data: {id: '123'}});
+  await wot.addTask({worker: 'fooError'});
+  await wot.addTask({worker: 'bar'});
+  await wot.addTask({worker: 'fooCron', when: '*/10 * * * * *'});
+  await wot.addTask({worker: 'fooCron', when: '*/1 * * * * *', data: 'id 20 '});
   return Promise.resolve(wot);
 };
 

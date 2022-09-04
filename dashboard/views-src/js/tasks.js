@@ -29,10 +29,10 @@ function loadTable () {
     ajax: './api/tasks',
     columns: [
       {title: 'uuid', uuid: 'uuid', data: 'uuid',
-        render: colorJobId
+        render: colorTaskId
       },
-      {title: 'Job', data: 'job', defaultContent: ''},
-      {title: 'Job Id', data: 'data.id', defaultContent: ''},
+      {title: 'Worker', data: 'worker', defaultContent: ''},
+      {title: 'Task Id', data: 'data.id', defaultContent: ''},
       {
         title: "Task Data",
         "className": 'details-control',
@@ -143,7 +143,7 @@ function formatDate (data, type, row) {
   return data ? dayjs.tz(data, 'Asia/Kolkata').format('YYYY-MM-DD kk:mm:ss') : ''
 }
 
-function colorJobId (data, type, row) {
+function colorTaskId (data, type, row) {
   let color
   if (row.status.completed) color = '#03a652'
   else if (row.status.failed || row.status.stopped) color = 'red'

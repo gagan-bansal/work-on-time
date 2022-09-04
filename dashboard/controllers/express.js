@@ -8,8 +8,8 @@ module.exports = function (wot, options) {
 
     create: async function (req, res) {
       console.log('body: ', JSON.stringify(req.body));
-      if (!req.body.job) {
-        return res.status(422).json({message: 'Paramter missing: job'});
+      if (!req.body.worker) {
+        return res.status(412).json({message: 'Paramter missing: worker'});
       }
       try {
         await wot.addTask(req.body);
@@ -20,7 +20,7 @@ module.exports = function (wot, options) {
     },
 
     list: async function (req, res) {
-      const opts = req.params.job ? {job: req.params.job} : {}
+      const opts = req.params.worker ? {worker: req.params.worker} : {}
       wot.getTasks(opts)
       .then(tasks => {
         res.status(200).json({data: tasks})
@@ -59,10 +59,20 @@ module.exports = function (wot, options) {
     },
 
     cronList: async function (req, res) {
-      const opts = req.params.job ? {job: req.params.job} : {}
+      const opts = req.params.worker ? {worker: req.params.worker} : {}
       try {
         const tasks = await wot.getCronTasks(opts)
         res.status(200).json({data: tasks})
+      } catch(err) {
+        res.status(500).json({message: 'Internal Server Error'})
+      }
+    },
+
+    workersList: async function (req, res) {
+      const opts = req.params.worker ? {worker: req.params.worker} : {}
+      try {
+        const workers = wot.getWorkers(opts)
+        res.status(200).json({data: workers})
       } catch(err) {
         res.status(500).json({message: 'Internal Server Error'})
       }

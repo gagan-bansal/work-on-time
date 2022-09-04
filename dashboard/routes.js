@@ -17,7 +17,8 @@ function getRouter (wot, options) {
   router.post('/api/tasks', controller.create);
   router.put('/api/task/stop/:uuid', controller.stop);
   router.put('/api/task/restart/:uuid', controller.restart);
-  router.get('/api/cron-tasks', controller.cronList);
+  router.get('/api/scheduled-tasks', controller.cronList);
+  router.get('/api/workers', controller.workersList);
   // for html views, js and css files
   router.get('/:file', views.staticFiles);
   return router;

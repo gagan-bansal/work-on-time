@@ -26,7 +26,7 @@ t.test('Class/instance', async t => {
     mongoUri: t.context.uri
   })
   t.ok(wot instanceof WorkOnTime, 'Instance created');
-  t.same(wot.jobs, {}, 'has property jobs');
+  t.same(wot.workers, {}, 'has property workers');
   t.ok(wot.store instanceof MongoStore, 'has mongo store');
 
   t.todo('onStart');

@@ -5,7 +5,7 @@ const { isClass } = require('./helper.js');
 const {Task} = require('../lib/task.js');
 const {MongoStore} = require('../lib/mongo-store.js');
 t.before(async () => {
-  t.context.job = {
+  t.context.worker = {
     name: 'mailer',
     worker: function () {
       return new Promise(() => {});
@@ -26,7 +26,7 @@ t.test('Create new instance', async (t) => {
   const task = new Task({
     data: {foo: 'bar', baz: {quax: 1}},
     when: 123
-  }, t.context.job, t.context.store);
+  }, t.context.worker, t.context.store);
   t.ok(task instanceof Task, 'Instance created');
   t.ok(uuid.validate(task.uuid), 'instance has uuid');
   t.type(task.save, 'function', 'has method save');
@@ -38,7 +38,7 @@ t.test('Create new instance', async (t) => {
   delete plain.status.created;
   t.same(plain,
     {
-      job: 'mailer',
+      worker: 'mailer',
       data: { foo: 'bar', baz: { quax: 1 } },
       when: 123,
       isCron: true,
@@ -56,9 +56,9 @@ t.test('Recreate instance', async (t) => {
   const task = new Task({
     data: {foo: 'bar', baz: {quax: 1}},
     when: 123
-  }, t.context.job, t.context.store);
+  }, t.context.worker, t.context.store);
   const plain = task.toPlainObject()
-  const task2 = Task.createTask(plain, t.context.job, t.context.store);
+  const task2 = Task.createTask(plain, t.context.worker, t.context.store);
 
   t.ok(task instanceof Task, 'Instance recreated');
   t.ok(task.uuid, 'has uuid');
@@ -72,7 +72,7 @@ t.test('Test task methods', async (t) => {
   const task = new Task({
     data: {foo: 'bar', baz: {quax: 1}},
     when: 123
-  }, t.context.job, t.context.store);
+  }, t.context.worker, t.context.store);
   t.ok(task.shouldProcess(), 'should process return true');
   task.status.started = Date.now()
   t.notOk(task.shouldProcess(), 'should process return false');

@@ -15,7 +15,7 @@ t.beforeEach(async t => {
   })
   const storeInit = await store.init();
   t.context.store = store;
-  t.context.job = {
+  t.context.worker = {
     name: 'mailer',
     worker: function () {
       return new Promise(() => {});
@@ -26,12 +26,12 @@ t.beforeEach(async t => {
   const task = new Task({
     data: 'foo',
     when: 123
-  }, t.context.job, t.context.store);
+  }, t.context.worker, t.context.store);
   //await task.save();
   t.context.task = task;
 
   t.context.plainTaskData = {
-    job: 'mailer',
+    worker: 'mailer',
     data: 'foo',
     when: 123,
     isCron: true,
@@ -58,13 +58,13 @@ t.todo('addTask method', async t => {
     uuid: 0,
     data: 'foo',
     when: 123
-  }, t.context.job), 'add task data to store');
+  }, t.context.worker), 'add task data to store');
 
   const task = await store.addTask({
     uuid: 1,
     data: 'foo',
     when: 123
-  }, t.context.job);
+  }, t.context.worker);
 
   t.ok(task instanceof Task,
     'added task data that returns an instance of Task');
@@ -108,7 +108,7 @@ t.skip('add cron pattern task', async t => {
   const cronTask = await store.addTask({
     data: 'foo',
     when: '5 4 * * *'
-  }, t.context.job);
+  }, t.context.worker);
 
   t.equal(cronTask.toPlainObject().when, '5 4 * * *',
     'added cron task data with cron pattern');
@@ -120,7 +120,7 @@ t.test('getCronTasks', async t => {
   const cronTask = new Task({
     data: 'foo',
     when: '5 4 * * *'
-  }, t.context.job, store);
+  }, t.context.worker, store);
   await cronTask.save();
   t.ok(typeof store.getCronTasks === 'function', 'has function getCronTask');
   t.resolves(store.getCronTasks(), 'getCronTasks promise resolves');
@@ -140,7 +140,7 @@ t.test('getIncompleteTasks', async t => {
     'getIncompleteTasks promise resolves before adding tasks');
   const task = new Task({
     data: 'foo',
-  }, t.context.job, store);
+  }, t.context.worker, store);
   await task.save();
   t.ok(typeof store.getIncompleteTasks === 'function', 'has function getIncompleteTask');
   t.resolves(store.getIncompleteTasks(), 'getIncompleteTasks promise resolves');
@@ -157,7 +157,7 @@ t.test('getTasks', async t => {
   // saving another task
   const task = new Task({
     data: 'foo',
-  }, t.context.job, store);
+  }, t.context.worker, store);
   await task.save();
   t.ok(typeof store.getTasks === 'function', 'has function getTasks');
   const tasks = await store.getTasks();

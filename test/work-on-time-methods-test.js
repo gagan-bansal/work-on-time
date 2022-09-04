@@ -43,14 +43,14 @@ t.test('_start', async t => {
 
 t.todo('stop');
 
-t.test('defineJob', async t => {
+t.test('defineWorker', async t => {
   const wot = t.context.wot
   t.doesNotThrow(() => {
-    return wot.defineJob({
+    return wot.defineWorker({
       name: 'foo',
-      worker: () => true
+      handler: () => true
     });
-  }, 'job defined');
+  }, 'Worker defined');
   t.todo('name missing throws error');
   t.todo('worker missing throws error');
 })

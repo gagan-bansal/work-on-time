@@ -3,7 +3,7 @@ const path = require('path');
 const app = express();
 const port = 3000;
 const dummyWot = require('./dummy-wot.js');
-const {expressAdapter} = require('./index.js');
+const {ExpressAdapter} = require('./index.js');
 if (process.env.NODE_ENV === 'development') {
   // from https://bytearcher.com/articles/refresh-changes-browser-express-livereload-nodemon/
   const livereload = require('livereload');
@@ -33,7 +33,8 @@ app.get('/', (req, res) => {
   const wot = await dummyWot();
   //app.use(express.static('dist', {})); // TODO how to handle this
   // mount dashboard router
-  const dashRouter = expressAdapter.getRouter(wot);
+  const expressAdapter = new ExpressAdapter(wot);
+  const dashRouter = expressAdapter.getRouter();
   app.use('/wot-dash', dashRouter);
   app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)

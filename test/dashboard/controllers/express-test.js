@@ -14,12 +14,12 @@ t.beforeEach(async t => {
   // initiate mongo
   const mongod = await MongoMemoryServer.create();
   const uri = mongod.getUri();
-  t.context.mongod = mongod
+  t.context.mongod = mongod;
   t.context.uri = uri;
 
   // initiate WorkOnTime
   const wot = new WorkOnTime({
-    mongoUri: t.context.uri
+    mongoUri: t.context.uri, db: 'workOnTime'
   })
   await wot.init();
   await wot._start();

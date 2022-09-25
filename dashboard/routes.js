@@ -6,7 +6,7 @@ const expController = require('./controllers/express.js');
 const expViews = require('./views.js');
 
 class ExpressAdapter {
-  
+
   constructor (wot, options) {
     this.wot = wot;
     this.options = options

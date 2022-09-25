@@ -69,7 +69,7 @@ function loadTable () {
         }
       }
     ],
-    order: [[ 1, "desc" ]],
+    order: [[ 4, "desc" ]],
     columnDefs:[{
       targets: '_all',
       createdCell: formatStatus
@@ -139,8 +139,10 @@ function formatDate (data, type, row) {
 }
 
 function formatWhen (data, type, row) {
-  return data;
+  if (typeof data === 'string') return data;
+  else return formatDate (data);
 }
+
 function colorTaskId (data, type, row) {
   let color
   if (row.status.stopped) color = 'orange'

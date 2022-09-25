@@ -124,7 +124,7 @@ function loadTable () {
         // Open this row
         //row.child( format(row.data()) ).show();
         const data = row.data();
-        row.child('<pre> ' + JSON.stringify(data || 'No result', null, 4) + '</pre>').show();
+        row.child('<pre> ' + JSON.stringify(data.result || 'No result', null, 4) + '</pre>').show();
         tr.addClass('shown');
         $(btn).val('Less')
       }

@@ -31,7 +31,6 @@ app.get('/', (req, res) => {
 
 (async () => {
   const wot = await dummyWot();
-  //app.use(express.static('dist', {})); // TODO how to handle this
   // mount dashboard router
   const expressAdapter = new ExpressAdapter(wot);
   const dashRouter = expressAdapter.getRouter();

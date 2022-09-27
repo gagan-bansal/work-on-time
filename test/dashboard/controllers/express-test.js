@@ -41,12 +41,16 @@ t.beforeEach(async t => {
   app.get('/health', expCtrl.health);
   app.post('/tasks', expCtrl.create);
   app.get('/tasks', expCtrl.list);
-  await app.listen();
+  t.context.expServer = await app.listen();
   t.context.app = app;
 });
 
 t.afterEach(async t => {
-  return t.context.mongod.stop();
+  t.context.expServer.close(async () => {
+    await t.context.wot.store.close();
+    await t.context.mongod.stop();
+    t.end();
+  });
 });
 
 t.test('Controller methods', async t => {

@@ -64,6 +64,8 @@ function loadTable () {
         "orderable":      false,
         "data":           null,
         render: function (data, type, row) {
+          const stts = data.status;
+          if (stts.completed || stts.failed || stts.abandoned) return '-';
           return data.isActive ? '<input class="btn btn-stop" type="button" value="Stop">'
             : '<input class="btn btn-activate" type="button" value="Activate">';
         }
@@ -145,8 +147,13 @@ function formatWhen (data, type, row) {
 
 function colorTaskId (data, type, row) {
   let color
-  if (row.status.stopped) color = 'orange'
-  else color = '#03a652'
+  if (row.status.stopped) {
+    color = 'orange'
+  } else if (row.status.completed) {
+    color = '#03a652'
+  } else {
+    color = '#524E4F'
+  }
   if (color) return `<span style="color:${color};font-weight:bold;">${data}</span>`
   else return data
 }

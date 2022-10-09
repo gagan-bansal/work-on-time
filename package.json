@@ -1,6 +1,6 @@
 {
   "name": "work-on-time",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Simple job scheduler for Node.js with persistence store.",
   "main": "index.js",
   "directories": {

@@ -154,8 +154,10 @@ function colorTaskId (data, type, row) {
   } else {
     color = '#524E4F'
   }
-  if (color) return `<span style="color:${color};font-weight:bold;">${data}</span>`
-  else return data
+  if (color)
+    return `<span style="color:${color};font-weight:bold;${row.status.deleted ? 'text-decoration: line-through' : ''}">${data}</span>`
+  else
+    return data
 }
 
 // createCell functions

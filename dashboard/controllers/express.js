@@ -23,7 +23,7 @@ module.exports = function (wot, options) {
       const opts = req.params.worker ? {worker: req.params.worker} : {}
       wot.getTasks(opts)
       .then(tasks => {
-        res.status(200).json({data: tasks})
+        res.status(200).json(tasks)
       })
       .catch(err => {
         res.status(500).json({message: 'Internal Server Error'})
@@ -34,6 +34,20 @@ module.exports = function (wot, options) {
       const uuid = req.params.uuid;
       try {
         const resp = await wot.stopTask(uuid);
+        res.status(200).json(resp);
+      } catch(err) {
+        if (err.statusCode === 404) {
+          res.status(404).json({message: 'No task: ' + uuid});
+        } else {
+          res.status(500).json({message: err.message});
+        }
+      };
+    },
+
+    delete: async function (req, res) {
+      const uuid = req.params.uuid;
+      try {
+        const resp = await wot.deleteTask(uuid);
         res.status(200).json(resp);
       } catch(err) {
         if (err.statusCode === 404) {
@@ -72,8 +86,9 @@ module.exports = function (wot, options) {
       const opts = req.params.worker ? {worker: req.params.worker} : {}
       try {
         const workers = wot.getWorkers(opts)
-        res.status(200).json({data: workers})
+        res.status(200).json(workers)
       } catch(err) {
+        console.error(err);
         res.status(500).json({message: 'Internal Server Error'})
       }
     }

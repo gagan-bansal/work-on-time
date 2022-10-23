@@ -8,8 +8,11 @@ const timezone = require('dayjs/plugin/timezone'); // dependent on utc plugin
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dt();
-import 'datatables.net-dt/css/jquery.dataTables.css';
 
+import * as addTaskModal from './add-task-modal.js';
+
+import 'datatables.net-dt/css/jquery.dataTables.css';
+import '../css/styles.css';
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const refreshInterval = urlParams.get('refreshInterval') || 30000
@@ -19,14 +22,20 @@ if (urlParams.get('refresh')) {
   }, parseInt(refreshInterval) * 1000);
 }
 
-let tasksTable;
+import './add-task-modal.js';
+let taskTable;
 
 loadTable();
 
 function loadTable () {
-  tasksTable = $('#tblTasks').DataTable({
+  taskTable = $('#tblTasks').DataTable({
     // data: data,
-    ajax: './api/tasks',
+    ajax: {
+      url: './api/tasks',
+      dataSrc: function (data) {
+        return data.filter(d => !d.status.delete);
+      } 
+    },
     columns: [
       {title: 'uuid', uuid: 'uuid', data: 'uuid',
         render: colorTaskId
@@ -76,8 +85,12 @@ function loadTable () {
         // "defaultContent": '<input class="btn btn-stop" type="button" value="Stop">'
         render: function (data, type, row) {
           const isRunning = data.status.started &&
-            !data.status.completed  && !data.status.failed && !data.status.stopped;
-          return isRunning ? '<input class="btn btn-stop" type="button" value="Stop">' : '-';
+            !data.status.completed  && !data.status.failed && !data.status.stopped
+            && !data.status.deleted;
+          let renderStr = '';
+          if (isRunning) renderStr = '<input class="btn btn-stop" type="button" value="Stop">';
+          //if (!data.status.deleted) renderStr += '<input class="btn btn-delete" type="button" value="Delete">'
+          return renderStr ? renderStr : '-';
         }
       }
     ],
@@ -85,12 +98,16 @@ function loadTable () {
     columnDefs:[{
       targets: '_all',
       createdCell: formatStatus
-    }]
+    }],
+    initComplete: function (settings, json) {
+      // init modal addTask
+      addTaskModal(taskTable);
+    }
   })
 
   $('#tblTasks tbody').on('click', '.btn-task-data', function () {
     var tr = $(this).closest('tr');
-    var row = tasksTable.row( tr );
+    var row = taskTable.row( tr );
     var btn = this;
       // var btn = $(this).find('input')
       if ( row.child.isShown() ) {
@@ -111,7 +128,7 @@ function loadTable () {
 
   $('#tblTasks tbody').on('click', '.btn-result', function () {
     var tr = $(this).closest('tr');
-    var row = tasksTable.row( tr );
+    var row = taskTable.row( tr );
     var btn = this;
       // var btn = $(this).find('input')
       if ( row.child.isShown() ) {
@@ -132,8 +149,14 @@ function loadTable () {
 
   $('#tblTasks tbody').on('click', '.btn-stop', function () {
     var tr = $(this).closest('tr');
-    var row = tasksTable.row( tr );
+    var row = taskTable.row( tr );
     stopTask(row.data());
+  });
+
+  $('#tblTasks tbody').on('click', '.btn-delete', function () {
+    var tr = $(this).closest('tr');
+    var row = taskTable.row( tr );
+    deleteTask(row.data());
   });
 }
 
@@ -146,11 +169,14 @@ function formatDate (data, type, row) {
 function colorTaskId (data, type, row) {
   let color
   if (row.status.completed) color = '#03a652'
-  else if (row.status.failed || row.status.stopped) color = 'red'
+  else if (row.status.failed || row.status.stopped || row.status.deleted) color = 'red'
   else if (row.status.started) color = '#444da3'
   else if (row.status.addedToQueue) color = '#fdaf16'
-  if (color) return `<span style="color:${color};font-weight:bold;">${data}</span>`
-  else return data
+  if (color) {
+    return `<span style="color:${color};font-weight:bold;${row.status.deleted ? 'text-decoration: line-through' : ''}">${data}</span>`
+  } else {
+    return data
+  }
 }
 
 // createCell functions
@@ -168,7 +194,22 @@ function stopTask(rowData) {
     cache: false
   })
   .done(function(data) {
-    tasksTable.ajax.reload(null, false);
+    taskTable.ajax.reload(null, false);
+  })
+  .fail(function (resp) {
+    console.error('Error: ', resp.message);
+  })
+}
+
+// delete the task
+function deleteTask(rowData) {
+  $.ajax({
+    method: 'DELETE',
+    url: `./api/task/${rowData.uuid}`,
+    cache: false
+  })
+  .done(function(data) {
+    taskTable.ajax.reload(null, false);
   })
   .fail(function (resp) {
     console.error('Error: ', resp.message);

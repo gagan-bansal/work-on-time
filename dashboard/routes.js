@@ -20,10 +20,13 @@ class ExpressAdapter {
 
     const views = expViews(this.wot);
 
-    router.get('/api/tasks', controller.list);
-    router.post('/api/tasks', controller.create);
-    router.put('/api/task/stop/:uuid', controller.stop);
-    router.put('/api/task/restart/:uuid', controller.restart);
+    router.get('/api/tasks?', controller.list);
+    router.post('/api/tasks?', controller.create);
+    //router.delete('/api/tasks?/:uuid', controller.delete);
+    router.delete('/api/tasks?/:uuid',
+      (req, res) => res.status(404).json({message: 'TODO'}));
+    router.put('/api/tasks?/stop/:uuid', controller.stop);
+    router.put('/api/tasks?/restart/:uuid', controller.restart);
     router.get('/api/scheduled-tasks', controller.cronList);
     router.get('/api/workers', controller.workersList);
     // for html views, js and css files

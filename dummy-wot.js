@@ -58,7 +58,6 @@ module.exports = async function () {
   await wot.addTask({worker: 'foo', data: {id: '123'}});
   await wot.addTask({worker: 'fooError'});
   await wot.addTask({worker: 'bar'});
-  await wot.addTask({worker: 'fooCron', when: '*/10 * * * * *'});
   await wot.addTask({worker: 'fooCron', when: '*/30 * * * * *', data: 'id 20 '});
   return Promise.resolve(wot);
 };

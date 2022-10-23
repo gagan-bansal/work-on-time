@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <title>Tasks' List</title>
@@ -8,6 +8,33 @@
   <body>
     <h2>Tasks' list</h2>
     <table id="tblTasks" class="display" style="width:100%">
+    </div>
+
+    <!-- Link to trigger modal -->
+    <a href="javascript:void(0);" class="btn btn-primary" id="addTaskLink">Add Task</a>
+
+    <!-- Add task modal popup box -->
+    <div id="modalAddTask" class="mpopup">
+    <!-- Modal content -->
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="close">×</span>
+        <h2>Add a new task</h2>
+      </div>
+      <div class="modal-body">
+        <!--p>Schedule a task</p-->
+     		<label for="selWorker">Worker:</label>
+				<select name="workers" id="selWorker">
+				</select><br><br>
+				<label for="txtWhen">When:</label>
+			  <input type="text" id="txtWhen" name="when"><br><br>
+				<label for="taData">Data:</label><br>
+			  <textarea type="textarea" id="taData" name="data" rows="6" cols="35">{ }</textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="btnSubmit">Submit</button>
+      </div>
+    </div>
     </div>
     <script type="module" src="./js/tasks.js"></script>
   </body>

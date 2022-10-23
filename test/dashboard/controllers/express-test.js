@@ -67,6 +67,6 @@ t.test('Controller methods', async t => {
     .expect('Content-Type', /json/)
     .expect(200)
     .then(resp => {
-      t.equal(resp.body.data.length, 1, "list: got tasks' list");
+      t.equal(resp.body.length, 1, "list: got tasks' list");
     })
 });

@@ -19267,7 +19267,7 @@ module.exports = function(taskTable) {
             taskTable.ajax.reload(null, false);
             mpopup.style.display = "none";
         }).fail((a, b, error)=>{
-            alert(data.message);
+            alert(a.responseJSON.message);
         });
     }
 };

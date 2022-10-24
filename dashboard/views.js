@@ -18,12 +18,9 @@ module.exports = function (options={}) {
       // console.log('serve file: %s, ext: %s', file, path.extname(file));
       res.sendFile(file, config, function (err) {
         if (err) {
-          // console.log('what to do no such file?');
           next()
           // console.error(err);
           // TODO trigger error event
-        } else {
-          console.log('/%s served', file);
         }
       })
     }

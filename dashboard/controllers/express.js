@@ -15,7 +15,7 @@ module.exports = function (wot, options) {
         await wot.addTask(req.body);
         res.status(200).json({message: 'Job created'})
       } catch (error) {
-        return res.status(500).json({message: error.message})
+        return res.status(422).json({message: error.message})
       }
     },
 

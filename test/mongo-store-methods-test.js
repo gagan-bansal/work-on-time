@@ -37,7 +37,6 @@ t.beforeEach(async t => {
     isCron: true,
     isSourceCron: false,
     storeResult: false,
-    persistCronStatus: true,
     persistTaskStatus: true,
     parentTask: false,
     isActive: true,

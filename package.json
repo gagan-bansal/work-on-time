@@ -10,8 +10,9 @@
   "scripts": {
     "test": "tap test/**/*test.js",
     "watch:dash": "parcel watch --dist-dir dist --public-url ./ --no-autoinstall --log-level verbose dashboard/**/*.html",
+    "watch:dev-server": "nodemon -i dashboard/views-src -i dist ./demo/demo-server.js",
     "build:dash": "parcel build --dist-dir dist --public-url ./ --no-autoinstall --log-level verbose dashboard/**/*.html",
-    "watch:dev-server": "nodemon -i dashboard/views-src -i dist-dev -i dist dev-server.js",
+    "demo": "nodemon demo/demo-server.js",
     "release:pre": "npm version prerelease --preid=alpha"
   },
   "targets": {
@@ -48,6 +49,7 @@
     "express": "^4.18.1",
     "jquery": "^3.6.0",
     "livereload": "^0.9.3",
+    "longjohn": "^0.2.12",
     "mockdate": "^3.0.5",
     "mongodb-memory-server": "^8.3.0",
     "parcel": "^2.6.2",

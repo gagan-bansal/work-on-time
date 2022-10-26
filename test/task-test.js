@@ -45,7 +45,6 @@ t.test('Create new instance', async (t) => {
       isSourceCron: false,
       storeResult: false,
       persistTaskStatus: true,
-      persistCronStatus: true,
       parentTask: false,
       isActive: true,
       status: {  }

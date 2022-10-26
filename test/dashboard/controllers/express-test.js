@@ -22,7 +22,7 @@ t.beforeEach(async t => {
     mongoUri: t.context.uri, db: 'workOnTime'
   })
   await wot.init();
-  await wot._start();
+  await wot.start();
   wot.defineWorker({
     name: 'foo',
     handler: () => Promise.resolve({count: 20})

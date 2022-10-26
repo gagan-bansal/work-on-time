@@ -11,12 +11,12 @@ t.beforeEach(async t => {
   t.context.mongod = mongod
   t.context.uri = uri;
   sinon.spy(MongoStore.prototype, 'init');
-  sinon.spy(WorkOnTime.prototype, '_start');
+  sinon.spy(WorkOnTime.prototype, 'start');
 })
 
 t.afterEach(async t => {
   MongoStore.prototype.init.restore();
-  WorkOnTime.prototype._start.restore();
+  WorkOnTime.prototype.start.restore();
   return t.context.mongod.stop();
 })
 

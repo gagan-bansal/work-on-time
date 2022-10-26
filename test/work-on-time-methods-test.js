@@ -31,14 +31,14 @@ t.test('Class/instance', async t => {
 
 t.todo('restart');
 
-t.test('_start', async t => {
+t.test('start', async t => {
   const wot = t.context.wot;
   t.equal(wot._started, false, 'on init not started the wot');
-  await t.context.wot._start();
+  await t.context.wot.start();
   t.equal(wot._started, true, 'started the wot');
   t.ok(wot._loadCronTasks.called, '_loadCronTasks called');
   t.ok(wot._loadScheduledTasks.called, '_loadScheduledTasks called');
-  await t.rejects(t.context.wot._start(), 'reject if system is already up');
+  await t.rejects(t.context.wot.start(), 'reject if system is already up');
 })
 
 t.todo('stop');

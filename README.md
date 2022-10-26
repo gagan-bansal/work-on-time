@@ -18,7 +18,7 @@ Here is a simple usage:
 
 ```js
 // import required classes
-const {WorkOnTime, Worker, MongoStore } = require('../index.js');
+const {WorkOnTime, Worker, MongoStore } = require('work-on-time');
 // initiate WorkOnTime
 const wot = new WorkOnTime({
   mongoUri: uri

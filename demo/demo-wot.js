@@ -26,22 +26,24 @@ const dummyWot = async function dummyWot () {
   const teaMaker = new Worker({
     name: 'teaMaker',
     handler: async (data) => {
+      console.log(`[teaMaker handler] will server ${data.cups} ☕ of tea after 5 sec`);
       await delay(5 * 1000); // 5 secs
       return Promise.resolve({cups: data.cups});
-    }
+    },
+    storeResult: true
   });
 
   teaMaker.on('complete', (result)=> {
-    console.log(`[teaMaker: worker event 'complete'] Served ${result.cups} cups of tea.`);
+    console.log(`[teaMaker: worker event 'complete'] Served ${result.cups} ☕ of tea.`);
   });
 
   wot.addWorker(teaMaker);
 
   const teaTask = await wot.addTask({
     worker: 'teaMaker',
-    when: '0 6 * * *',
+    when: '*/30 * * * * *',
     data: {
-      cups: 1
+      cups: 2
     }
   });
 
@@ -106,7 +108,9 @@ const dummyWot = async function dummyWot () {
     name: 'flash',
     handler: async () => {
       console.log('[flash: handler] ⚡⚡⚡');
-    }
+      return Promise.resolve('⚡⚡⚡');
+    },
+    storeResult: true
   });
 
   wot.addWorker(flash);
